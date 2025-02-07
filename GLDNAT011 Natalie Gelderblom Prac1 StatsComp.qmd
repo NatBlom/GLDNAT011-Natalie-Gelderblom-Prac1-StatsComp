@@ -1,5 +1,6 @@
 ---
-title: "GLDNAT011 Natalie Gelderblom Prac1 StatsComp"
+title: "Prac1 StatsComp"
+author: "GLDNAT011 Natalie Gelderblom"
 ---
 
 ## Question 1
