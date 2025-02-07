@@ -14,16 +14,9 @@ head(airquality)
 
 ```{r}
 
-NA.Ozone <- which(is.na(airquality$Ozone))
-NA.Solar<-which(is.na(airquality$Solar.R))
-NAwhich(is.na(airquality$Wind))
-which(is.na(airquality$Temp))
-which(is.na(airquality$Month))
-which(is.na(airquality$Day))
+rows.NA <-which(is.na(airquality)) # get the indices of all the rows which have NA
+airquality[rows.NA,] # print out the corresponding rows 
 
-rows.NA <- unique(sort(c(NA.Ozone,NA.Solar)))
-
-rows.NA
 ```
 
 ## Question 2
