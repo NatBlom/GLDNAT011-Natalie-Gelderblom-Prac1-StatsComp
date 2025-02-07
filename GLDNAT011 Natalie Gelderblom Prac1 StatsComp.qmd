@@ -45,19 +45,12 @@ o.mean<-mean(ozone.cleaned)
 o.sd <-sd(ozone.cleaned)
 o.max<-max(ozone.cleaned) 
 o.min<-min(ozone.cleaned)
-
-#---------------create a table to display it------------------
-
-# create a matrix
-tmp.ozn.data <-matrix(c(t.mean,t.sd,t.max,t.min,o.mean,o.sd,o.max,o.min),ncol=4,byrow=TRUE)
-
-#specify column and row names 
-colnames(tmp.ozn.data) <-c("mean","sd","min","max")
-rownames(tmp.ozn.data) <-c("temperature","ozone")
-
-# make it a table and display
-as.table(tmp.ozn.data)
 ```
+
+|             | Mean       | Standard Deviation | Maximum   | Minimum   |
+|-------------|------------|--------------------|-----------|-----------|
+| Temperature | `r t.mean` | `r t.sd`           | `r t.max` | `r t.min` |
+| Ozone       | `o.mean`   | `r t.sd`           | `r t.max` | `r t.min` |
 
 
 ## Question 3
