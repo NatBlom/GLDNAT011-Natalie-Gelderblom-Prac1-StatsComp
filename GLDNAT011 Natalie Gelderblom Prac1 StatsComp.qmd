@@ -97,3 +97,53 @@ lm.model <-summary(lm(dist ~ speed, data = cars))
 lm.model
 ```
 
+## Question 5
+
+Create a function which returns a list of the beta estimates, standard errors, tstats and p values.
+
+Use this to compare to check if the output from the lm() function gives the same values.
+
+```{r}
+
+regression.to.list <- function(X,Y){
+  
+  # get the beta estimates 
+  b_hats = solve(t(X) %*% X) %*% t(X) %*% Y
+  
+  # calculate the standard error
+  residuals <- Y - (X%*%b_hats)
+  Squared <-1/(length(Y)-length(b_hats))*t(residuals)%*%residuals
+  SE = sqrt(as.numeric(Squared)*diag(solve(t(X)%*%X)))
+  
+  #calculate the t stats
+  tstat <-b_hats/SE
+  
+  #calculate the p values
+  degreesfreedom <- length(Y)-2
+  pval <- 2*(1-pt(abs(tstat),degreesfreedom))
+  
+  return(list("beta"=b_hats, "standard error"=SE,"tstat"=tstat,"pvalue"=pval))
+  
+}
+
+regression.to.list(X,Y)
+
+
+lm.to.list <- function(model1){
+
+  beta.lm <- model1$coefficients #  beta estimates
+  SE.lm <-summary(model1)$coefficients[,2] # 2nd column is the std.error
+  tstat.lm <-summary(model1)$coefficients[,3] # 3rd col is the tstats
+  pval.lm <- summary(model1)$coefficients[,4] # 4th col is the pvals 
+  
+  return(list("beta"=beta.lm, "standard error"=SE.lm,"tstat"=tstat.lm,"pvalue"=pval.lm))
+  
+}
+
+model_input <- lm.model <-lm(dist~speed,data=cars)
+
+list.1 <- regression.to.list(X,Y)
+list.1
+list.2 <- lm.to.list(model_input)
+list.2
+```
