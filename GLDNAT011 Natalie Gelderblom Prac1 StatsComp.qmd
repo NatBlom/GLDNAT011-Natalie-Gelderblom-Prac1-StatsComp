@@ -2,10 +2,100 @@
 title: "GLDNAT011 Natalie Gelderblom Prac1 StatsComp"
 ---
 
-## Quarto
+## Question 1
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+Airquality is a built in R data set of daily air quality measurements in New York, May to September 1973. The first few observations are shown below:
 
 ```{r}
-1 + 1
+head(airquality)
 ```
+
+1.Find all rows in “airquality” that have missing values.
+
+```{r}
+
+NA.Ozone <- which(is.na(airquality$Ozone))
+NA.Solar<-which(is.na(airquality$Solar.R))
+NAwhich(is.na(airquality$Wind))
+which(is.na(airquality$Temp))
+which(is.na(airquality$Month))
+which(is.na(airquality$Day))
+
+rows.NA <- unique(sort(c(NA.Ozone,NA.Solar)))
+
+rows.NA
+```
+
+## Question 2
+
+2\. Find mean, sd, min, max for each of temperature and ozone level.
+
+```{r}
+
+#-------- define your variables----------------------------
+# Ozone has missing variables so you have to clean it before you can use the other functions like mean()
+ozone.cleaned <-na.omit(airquality$Ozone) # na.omit() returns object without incomplete cases
+temperature <-airquality$Temp
+
+#------------Get mean, sd, min, max---------------
+
+# apply(data, rows-1 cols - 2, function with no brackets)
+ 
+# For temperature
+t.mean<-mean(temperature) # temp |> mean(na.omt) 
+t.sd <-sd(temperature)
+t.max <-max(temperature) 
+t.min <-min(temperature)
+
+# for ozone
+o.mean<-mean(ozone.cleaned) 
+o.sd <-sd(ozone.cleaned)
+o.max<-max(ozone.cleaned) 
+o.min<-min(ozone.cleaned)
+```
+
+
+## Question 3
+
+3\. For linear regression, parameter estimates can be found as follows:
+
+$\hat{\beta}  = (X^TX)^{-1}X^TY$
+
+Where Y is the response variable and X is the design matrix.
+
+In the cars data set the response variable Y is stopping distance and the independent variable is speed.
+
+Using the equation above you get the following results for the intercept and coefficient estimates:
+
+```{r}
+
+#--------------define variables---------------------------------------
+X = cbind(1, cars$speed)
+Y = cars$dist
+# design matrix needs to be a 2 column matrix to have the output calculate both the intercept and the coefficient
+
+#-------------Matrix Operations-----------------------------------------
+# t(matrix) tranpose of a matrix 
+# v1 %*% m1 matrix multiplication
+# solve(m1) inverse of matrix 
+
+#---------Find estimates using equation ----------------------------
+
+beta_hats = solve(t(X) %*% X) %*% t(X) %*% Y
+
+beta_intercept = beta_hats[1,1] # extract the intercept from the beta_hats matrix
+beta_coefficent =beta_hats[2,1] # extract the speed coeffcient from the beta_hats matrix
+
+print(paste("the intercept is", beta_intercept,"and the coefficent on speed is", beta_coefficent))
+```
+
+## Question 4
+
+4.  You can check that you get the same estimates as when fitting the linear regression model using lm() in R.
+
+```{r}
+# lm(dependent~independent,data=?)
+lm.model <-summary(lm(dist ~ speed, data = cars))
+lm.model
+```
+
