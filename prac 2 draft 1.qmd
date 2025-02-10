@@ -308,7 +308,7 @@ mulit.carriers
 
 # calculate the average arrival delay
 
-av_ar_delay <- mulit.carriers |> group_by(origin,dest,carrier) |> summarise("average arrival delay"=mean(arr_delay, na.rm=TRUE)) 
+av_ar_delay <- mulit.carriers |> group_by(origin,dest,carrier) |> summarise("average_arrival_delay"=mean(arr_delay, na.rm=TRUE)) 
 av_ar_delay
 
 
@@ -317,32 +317,55 @@ with_names
 
 ```
 
-```{r}
-
-# Keep only origin airports that appear in flights2
-flights |> semi_join(multiple.carriers, join_by(faa == origin))
-
-
-flights |> 
-  filter(origin %in% c(1, 2))
-```
-
 -   For each such route, identify the airline with the worst and best average arrival delay.
 
 ```{r}
+min.max <- with_names|> group_by(origin,dest) |> summarise("min.d" =min(average_arrival_delay), "max.d" = max(average_arrival_delay)) 
+min.max
+
+
+
+
+# only want it to macth witht the separate cols ---- make two new cols for best and worst airline names next to the 
+left_join(min.max,with_names)
+
+inner_join(min.max,with_names)
+
+middle_join(min.max,with_names)
+
+
+# doing them separate to get the carriers still in 
+min.delay <- with_names|> group_by(origin,dest) |> summarise(min("min" = average_arrival_delay)) |> ungroup()
+min.delay 
+
+max.delay <- with_names|> group_by(origin,dest) |> summarise(min("min" = average_arrival_delay), max("max" = average_arrival_delay))
+max.delay
+
+# ask how you get it to keep the carrier names? 
 
 ```
 
 -   Identify the route with the greatest difference between the best and worst performing airlines
 
 ```{r}
+ranges <- min.max|> group_by(origin,dest) |> mutate(range.d = max.d-min.d,.before = 1) 
+ranges
 
+
+biggest_range <-ranges |> arrange()
+origin_biggest_delay <-biggest_range$origin[1]
+dest_biggest_delay <-biggest_range$dest[1]
+
+# alternative could have used summarise ? 
 ```
+
+The route with the greatest difference between the best and the worst performing airlines was from `origin_biggest_delay` to `dest_biggest_delay`
 
 -   Determine the reason for this difference
 
 ```{r}
-
+info <- flights |> filter(origin=="EWR",dest=="ATL")
+info
 ```
 
 7.  Identify all columns with missing entries, typos and any other inconsistencies in the dataset below (load it just by running the code; created using `dput` command, FYI
