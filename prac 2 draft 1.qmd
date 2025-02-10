@@ -320,7 +320,7 @@ with_names
 -   For each such route, identify the airline with the worst and best average arrival delay.
 
 ```{r}
-min.max <- with_names|> group_by(origin,dest) |> summarise("min.d" =min(average_arrival_delay), "max.d" = max(average_arrival_delay)) 
+min.max <- with_names|> group_by(origin,dest) |> summarise("min.d" =min(average_arrival_delay),"smallest_delay"=name[average_arrival_delay==min(average_arrival_delay)], "max.d" = max(average_arrival_delay), "biggest_delay"=name[average_arrival_delay==max(average_arrival_delay)]) 
 min.max
 
 
@@ -334,16 +334,26 @@ inner_join(min.max,with_names)
 middle_join(min.max,with_names)
 
 
+
+
+
+
+
+
+
+
 # doing them separate to get the carriers still in 
 min.delay <- with_names|> group_by(origin,dest) |> summarise(min("min" = average_arrival_delay)) |> ungroup()
 min.delay 
 
-max.delay <- with_names|> group_by(origin,dest) |> summarise(min("min" = average_arrival_delay), max("max" = average_arrival_delay))
+max.delay <- with_names|> group_by(origin,dest) |> summarise(min("min" = average_arrival_delay), max("max" = average_arrival_delay),)
 max.delay
 
 # ask how you get it to keep the carrier names? 
 
 ```
+
+\
 
 -   Identify the route with the greatest difference between the best and worst performing airlines
 
