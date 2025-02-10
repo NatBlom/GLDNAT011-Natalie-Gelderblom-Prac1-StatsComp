@@ -301,9 +301,20 @@ multiple.carriers
 
 ```{r}
 
-flights |> group_by(origin,dest,carrier) |> summarise("average arrival delay"=mean(arr_delay, na.rm=TRUE)) 
-
 # extract the flights that are from the routes in the multiple carriers data frame 
+# innerjoin shows all of the entries in the first table that have matches in the second table 
+mulit.carriers <- flights |> inner_join(multiple.carriers)
+mulit.carriers
+
+# calculate the average arrival delay
+
+av_ar_delay <- mulit.carriers |> group_by(origin,dest,carrier) |> summarise("average arrival delay"=mean(arr_delay, na.rm=TRUE)) 
+av_ar_delay
+
+
+with_names <- left_join(av_ar_delay,airlines)
+with_names
+
 ```
 
 ```{r}
