@@ -147,4 +147,7 @@ list.1 <- regression.to.list(X,Y)
 list.1
 list.2 <- lm.to.list(model_input)
 list.2
+
+identical(list.1,list.2)
+
 ```
