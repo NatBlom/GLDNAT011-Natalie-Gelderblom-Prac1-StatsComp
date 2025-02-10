@@ -364,8 +364,19 @@ The route with the greatest difference between the best and the worst performing
 -   Determine the reason for this difference
 
 ```{r}
-info <- flights |> filter(origin=="EWR",dest=="ATL")
+info <- flights |> filter(origin=="EWR",dest=="ATL") 
 info
+
+info.2 <- flights |> filter(origin=="EWR",dest=="ATL") |> distinct(carrier)
+info.2
+# there are 4 carriers  DL, EV, UA, 9E
+
+relevant.info<- info |> select(!year)
+relevant.info
+
+summary(info)
+
+summary(flights)
 ```
 
 7.  Identify all columns with missing entries, typos and any other inconsistencies in the dataset below (load it just by running the code; created using `dput` command, FYI
@@ -480,4 +491,27 @@ NA, 77, 80, 115, 85, 88, 109, NA, 71, 90, 94, 91, 87, 113, 93,
 library(skimr)
 skim(data.2)
 
+
+# install the UtilsDataRSV package, use the following code:
+
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+remotes::install_github("SATVILab/UtilsDataRSV")
+library(UtilsDataRSV)
+view_cols(data.2)
+
+
+#1. gender 
+# femal is a type for female 
+
+#2. height 
+# there are NA values in height
+
+#3. healthy 
+# Healthy" and  "healthy should just be one thing 
+# would make Healthy into healthy since everything else is lower case 
+
+# 4. glucose 
+# has NA values 
 ```
