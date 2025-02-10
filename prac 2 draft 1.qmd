@@ -158,6 +158,7 @@ dist_tbl[order(dist_tbl$mean_distance), ]
 
 flit.xx <-group_by(flight1,carrier)
 flit.xxy <- flight1 |> group_by(carrier) |> summarise(avg_distance = mean(distance, na.rm = TRUE))
+# na.rm = true means exclude 
 flit.xxy
 
 flit.xxyzx <- flights |> filter(month==1) |> group_by(carrier) |> summarise(avg_distance = mean(distance, na.rm = TRUE),sd_dist = sd(distance))
@@ -171,7 +172,7 @@ new.flit
 ```{r}
 
 # Extract all of the flights in month 1 and group them by carrier type 
-flights.1.c <- flights |> filter(month==1) |> group_by(carrier)
+flights.1.c <- flights |> filter(month==1) |> group_by(carrier) 
 
 # Get the mean and the sd of distance by each carrier
 summary.stats <- flights.1.c |> summarise(mean_dist = mean(distance),sd_dist = sd(distance))
@@ -218,20 +219,9 @@ distinct.distances <- distinct(flights.YV.1,distance)
 
 ```{r}
 
-# i feel like there is an easier way
 
-flights.4 <- flights  |> select(carrier,dep_delay)|> group_by(carrier)
-flights.4
-
-stats.4 <- flights.4 |> summarise(average.dep.delay = mean(dep_delay, na.rm=TRUE))
-stats.4
-
-  
-# expand it 
-
-flights.4 |> pivot_wider(names_from = carrier, values_from = dep_delay)
-
-stats.4 |> pivot_wider(names_from = carrier, values_from = dep_delay)
+av_dep_delay <-  flights |> group_by(carrier,month) |> summarise(average.dep.delay = mean(dep_delay, na.rm=TRUE)) |> pivot_wider(names_from = carrier, values_from = average.dep.delay)
+av_dep_delay
 
 ```
 
@@ -249,7 +239,7 @@ stats.4 |> pivot_wider(names_from = carrier, values_from = dep_delay)
 
     ```
 
-4.  Using the `airlines` and `flights` datasets, do the following, showing the output from each step:
+5.  Using the `airlines` and `flights` datasets, do the following, showing the output from each step:
 
 -   Identify routes that more than one airline flies
 
@@ -257,19 +247,92 @@ origin, dest : Origin and destination. See airports for additional metadata.
 
 ```{r}
 
+# working out for this question 
+
+
+
 # origin, dest
 
-routes <- flights |> distinct(origin,dest) 
+# all of the different routes 
+routes <- flights |> 
 routes
+
+
+route.groups <- flights |> group_by(origin,dest) |> unique(carrier)
+route.groups
+
+
+# the routes that each carrier takes
+carrier.routes <- flights |> group_by(carrier) |> distinct(origin,dest) 
+carrier.routes
+
+
+
+routes.withcarriers <- flights |> group_by(dest,origin) |> distinct(carrier) |> arrange(dest,origin)
+
+# two ways to count up the number of entires of the dest,origin
+routes.withcarriers |> summarise(count=n())
+routes.withcarriers |> tally()
+
+number.of.carriers <- routes.withcarriers |> tally()
+number.of.carriers
+
+multiple.carriers <- number.of.carriers |> filter(n>1)
+multiple.carriers
+```
+
+-   Identify routes that more than one airline flies
+
+```{r}
+
+# final answer for this question 
+
+# filter the rows so that it is a data frame with each carrier for each route
+routes.withcarriers <- flights |> group_by(origin,dest) |> distinct(carrier, .keep_all=TRUE) 
+routes.withcarriers
+
+# select the routes that have multiple carriers 
+multiple.carriers <- routes.withcarriers |> tally() |> filter(n>1)
+multiple.carriers
+
 ```
 
 -   For each such route, calculate the average arrival delay for each airline (exclude NAs). Find the names of these airlines.
 
+```{r}
+
+flights |> group_by(origin,dest,carrier) |> summarise("average arrival delay"=mean(arr_delay, na.rm=TRUE)) 
+
+# extract the flights that are from the routes in the multiple carriers data frame 
+```
+
+```{r}
+
+# Keep only origin airports that appear in flights2
+flights |> semi_join(multiple.carriers, join_by(faa == origin))
+
+
+flights |> 
+  filter(origin %in% c(1, 2))
+```
+
 -   For each such route, identify the airline with the worst and best average arrival delay.
+
+```{r}
+
+```
 
 -   Identify the route with the greatest difference between the best and worst performing airlines
 
+```{r}
+
+```
+
 -   Determine the reason for this difference
+
+```{r}
+
+```
 
 7.  Identify all columns with missing entries, typos and any other inconsistencies in the dataset below (load it just by running the code; created using `dput` command, FYI
 
