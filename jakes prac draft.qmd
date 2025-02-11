@@ -1,6 +1,6 @@
 ---
-title: "Jakes Prac Draft"
-author: "Natalie Gelderblom"
+title: "Day 2/3 Practical StatsComp"
+author: "GLDNAT011 Natalie Gelderblom"
 format: html
 ---
 
