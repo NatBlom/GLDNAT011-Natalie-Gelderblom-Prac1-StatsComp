@@ -1,6 +1,6 @@
 ---
-title: "Practical 2 Statistical Computing"
-author: "Natalie Gelderblom"
+title: "Day 4 PRac Statistical Computing"
+author: "GLDNAT011 Natalie Gelderblom"
 format: html
 ---
 
@@ -33,6 +33,16 @@ Using the `flights` dataset:
 
 1.  Display the `flights` dataset in an alternative format to simply printing it (i.e. running `flights`).
 
+```{r}
+
+# two options 
+
+head(flights)
+
+glimpse((flights))
+
+```
+
 2.  Rewrite this code using `dplyr` and the pipe:
 
 This code creates a tibble of all of the means and standard deviations of the carriers for month 1 and then orders it according to the mean.
@@ -42,6 +52,7 @@ flight1 <- flights[flights$month == 1, ]
 carrier_vec <- unique(flight1$carrier)
 carrier_dist_vec_mean <- numeric(length(carrier_vec))
 carrier_dist_vec_sd <- numeric(length(carrier_vec))
+
 for (i in seq_along(carrier_vec)) {
   carrier_dist_vec_mean[i] <- mean(
     flight1$distance[flight1$carrier == carrier_vec[i]]
@@ -89,7 +100,7 @@ flights.OO.1
 nrow(flights.OO.1)
 ```
 
-All flights by YV planes in month 1 fly the same distance of 229 so there is no variation in the distance travelled by YV carrier flights in month 1. This results in a standard deviation of zero.
+All flights by YV planes in month 1 fly the same distance of 229 so there is no variation in the distance traveled by YV carrier flights in month 1. This results in a standard deviation of zero.
 
 These observations are demonstrated using the code below:
 
@@ -162,7 +173,10 @@ mulit.carriers
 av_ar_delay <- mulit.carriers |> group_by(origin,dest,carrier) |> summarise("average_arrival_delay"=mean(arr_delay, na.rm=TRUE)) 
 av_ar_delay
 
+
 # Find the names of these airlines
+airlines = nycflights13::airlines
+
 with_names <- left_join(av_ar_delay,airlines)
 with_names
 
@@ -201,13 +215,31 @@ info.2 <- flights |> filter(origin=="EWR",dest=="ATL") |> distinct(carrier)
 info.2
 # there are 4 carriers  DL, EV, UA, 9E
 
-relevant.info<- info |> select(!year)
-relevant.info
+how_many_flights <- info |> group_by(carrier)|> tally() |>arrange(n)
+how_many_flights
+
+most_flights <- how_many_flights[1,]
+most_flights
+
+least_flights <- how_many_flights[4,]
+least_flights
+
+# most flights is 9E
+# lest flights is 
+
+best_airline <- biggest_range[1,5]
+best_airline #  Endeavor Air Inc. 9E 
+
+worst_airline <-biggest_range[1,7]
+worst_airline # express jet EV
+
 
 summary(info)
 
 summary(flights)
 ```
+
+The best airline in the route has far fewer flights on that route so it has less delays overall. It is a very small amount of flights for the best airline (EV = Endeavor Air Inc. ) so it is not nessesarily representative. It is also interesting that the airline with the most flights (DL = Delta Air Lines Inc. ) is not the airline with the most delays.
 
 7.  Identify all columns with missing entries, typos and any other inconsistencies in the dataset below (load it just by running the code; created using `dput` command, FYI
 
