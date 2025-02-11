@@ -10,8 +10,7 @@ Locally wieighted scatterplot smoothing (Lowess) is a smoothing technique which 
 
 #### What is Lowess?
 
-The Lowess approach attempts to look at the closest neighbours of a data point to find some weighted average of the closest neighbours to act as the smoothed data point, providing a smoothed function
-$ \hat{y} = f(x) $
+The Lowess approach attempts to look at the closest neighbours of a data point to find some weighted average of the closest neighbours to act as the smoothed data point, providing a smoothed function \$ \hat{y} = f(x) \$
 
 ## **Steps to Lowess**
 
@@ -21,7 +20,7 @@ As usual, we have observed data pairs(x1,y1),…,(xn,yn).
 
 ### **2. Span**
 
-We need to choose the **span** of the smoothing, denoted f  such that 0<f<1. The span defines the number of closest neighbours to use when smoothing point xi such that
+We need to choose the **span** of the smoothing, denoted f  such that 0\<f\<1. The span defines the number of closest neighbours to use when smoothing point xi such that
 
 k=⌈f⋅n⌉
 
@@ -31,7 +30,7 @@ where k is the number of closest neighbours used for point xi and n is the
 
 The weights applied to each neighbour is calculated using the tricube kernel such that
 
-wj=(1−(|xj−xi|dmax)3)3
+wj=(1−(\|xj−xi\|dmax)3)3
 
 $$
 w_j = ( (1-(\frac{|x_j-x_i|}{d_{max}})^3 )^3
@@ -41,7 +40,7 @@ where wj is the weight for neighbour xj, 
 
 dmax is the distance to the farthest neighbour among the k neighbours selected.
 
-Note that this means that if |xj−wi|≥dmax, then wj=0.
+Note that this means that if \|xj−wi\|≥dmax, then wj=0.
 
 So if the distance of the observation is further than the dmax distance then it has a weight of zero and does not impact the regression.
 
@@ -92,7 +91,7 @@ $$
 
     -   Generate y as a noisy sine wave such thatyi=sin⁡(xi10)+ei
 
-        where \^ei∼N(0,0.2)^2 )
+        where \^ei∼N(0,0.2)\^2 )
 
 $$
 y_i = sin(\frac{x_i}{10})+ e_i
@@ -120,80 +119,186 @@ plot(y)
     0\<f\<1
 
 ```{r}
+library(dplyr)
+```
 
-customLowess <- function(x,y=NULL,f=2/3) {
+# ask tutors??
+
+why does it need to only be a small matrix?
+
+why not work with 100 x 100 ?
+
+for W and X
+
+```{r}
+
+customLowess <- function(x,y,f) {
   
-  # take this out its just for now to test stuff 
-  f=2/3
-  
-  
-  #============get the span ===================
+  #f=0.2
   # find the number of observations in your data
   n=length(x)
   
-  # k is the number of closest neighours used for xi
-  k.unrounded = f*n
-  
-  # do you need to round since it is used as an index later 
-  # if so is it ceiling or floor? 
-  k=round(k.unrounded)
-  
-  
-  #==========compute the weights=============
-  
-    
-  # xi is observation or point 
-  # xj is the neighbour to xi
-  # weight wj = for neighbour xj
-  
   # create a vector to hold the fitted values to return 
   yfitted<- numeric(n)
-  print("yfitted")
-  print(yfitted)
   
+  weights <- cbind(1:n,numeric(n))
+  weights
+  
+  
+  
+  
+  
+  #==========================get the span ==========================
+  # k is the number of closest neighours used for xi
+  # the notation in th q means ceiling round 
+  k=ceiling(f*n)
+
   
   
   # ---------------loop through each observation------------------
   for (i in 1:n) {
     
-    # create a vector to hold all the distances for a given observation 
-    dist_vec <- numeric(n)
-    print("dist_vec")
-    print(dist_vec)
-    
-    # create vector to hold all the weights for a given observation 
-    w <- numeric(n)
-    print("w")
-    print(w)
+    #i=20
   
-  #------------find the distances to all other observations--------
-    print("starting distances loop")
+    #====================calculate the weights =====================
+    
+    xi <- x[i] # extract the current observation 
+    distance_vec<- abs(x-xi) # distance between observations and the current x
+    
+    # get the dmax 
+    distances.df <- data.frame(x,distance_vec,y) |> arrange(distance_vec)
+    
+    dmax <- distances.df[k,2]
+    
+    # take the k closest observations to xi 
+    k_neighbours <- distances.df[1:k,]
+    k_neighbours
+    
+    # get the weights
+    # w <- cbind(k_neighbours[,1,],(1-(k_neighbours[,2]/dmax)^3)^3)
+    
+    w = numeric(n)
+    w[k_neighbours$x] <- (1-(k_neighbours[,2]/dmax)^3)^3
+    w
+    
+    #k_neighbours_indices<- distances.df[1:k,1]
+    #k_neighbours_indices
+    
+    
+    # another way to do this? 
+    
+    #for (i in k_neighbours_indices){
+    #  weights[i,2]<-w[i]
+    #}
+   
+    
+    #==================== do the weighted regression ================
+    
+    # make the W matrix with weights as the diagonal 
+    W <- diag(w)
+    W
+    
+    # X is the design matrix so there must be both observations and 1 
+    X <- cbind(1,x)
+    X
+
+    # find the The optimal beta
+    beta_hats = solve(t(X) %*% W %*% X) %*% t(X) %*% W %*% y
+    beta_hats
+   
+    # calculate the fitted value and put it into yfitted[i]
+    yfitted[i] <- beta_hats[1,1] + beta_hats[2,1]*xi
+  }
+  
+  #=================return the predicted values====================
+  return(yfitted)
+}
+
+
+
+
+fitted_y <- customLowess(x,y,0.2)
+plot(fitted_y)
+
+
+```
+
+```{r}
+
+
+
+
+# =============================working out ==================================
+
+customLowess <- function(x,y,f) {
+  
+  # take this out its just for now to test stuff 
+  f=2/3
+  
+  # create a vector to hold the fitted values to return 
+  yfitted<- numeric(n)
+  
+  # find the number of observations in your data
+  n=length(x)
+  
+  
+  #============get the span ===================
+  # k is the number of closest neighours used for xi
+  k=round(f*n)
+  
+ 
+  
+  #==========compute the weights=============
+  
+  # xi is observation or point 
+  # xj is the neighbour to xi
+  # weight wj = for neighbour xj
+
+  
+  # ---------------loop through each observation------------------
+  for (i in 1:n) {
+    
+    i=4
+    xi <- x[i] # extract the current observation 
+    distance_vec<- abs(x-xi) # distance between observations and the current x
+    distance_vec
+    
+    distances.df <- data.frame(x,distance_vec) |>sort()
+    distances.df
+    
+    distances.sorted <- distances.df |> sort(distance_vec)
+    distances.sorted
+    
+    
+    
+    # vectors to be filled 
+    
+    w <- numeric(n) # for weights 
+  
+  #------------find the distances to all other observations-----
+    
+    
+    
     for (j in 1:n)
   {
-      print("j")
-      print(j)
+
     # find all the distances and sort it 
       # need to make it a vector
       dist_vec[j]<- abs(x[j]-x[i])
-      print("dist_vec[j]")
-      print(dist_vec[j])
+
     } 
-    
-    print("updated dist vec")
-    print(dist_vec)
+
     
     #------------------- get dmax --------------------
     
     # find the kth distance to get dmax
     distances_sorted <- dist_vec |> sort() 
     dmax <- distances_sorted[k]
-    print("dmax:")
-    print(dmax)
+
     
     
     #---------- calculate the weights -------------------
     for (j in 1:n){
-      print(j)
       
       # if the distance is more than dmax then the weight is just zero
       if (dist_vec[j]>= dmax)
@@ -204,20 +309,26 @@ customLowess <- function(x,y=NULL,f=2/3) {
       w[j] = (  1-  ( abs(x[j]-x[i]) / dmax )^3   )^3
     }
       
-      print(w[j])
+      #==============================================================
+      #=================correct until here!!!========================
+      #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  
 
     }
     #==================== do the weighted regression ================
     # W = diagonal matrix with diagonal given by the weights
     W <- diag(w,n,n)
-    W
+    print("this is w")
+    print(W)
     
     # X is the design matrix so there must be both observations and 1 
     X <- cbind(1,x)
-    X
     
+    print("this is x")
+    print(X)
+    ym <- as.matrix
     # find the The optimal beta
-    beta_hats = solve(t(X) %*% W %*% X) %*% t(X) %*% W %*% y
+    beta_hats = solve(t(X) %*% W %*% X) %*% t(X) %*% W %*% ym
     beta_intercept = beta_hats[1,1] # extract the intercept from the beta_hats matrix
     beta_coefficent =beta_hats[2,1] # extract the speed coeffcient from the beta_hats matrix
     
@@ -246,6 +357,11 @@ customLowess(x)
     -   Plot both curves to compare their smoothing values.
 
 ```{r}
-R.lowess <- lowess(x,y,iter=0)
-plot(R.lowess)
+
+plot(y)
+
+R.lowess <- lowess(x,y,0.2,iter=0)
+
+lines(R.lowess,col="green",lwd=10)
+lines(fitted_y,col="red",lwd=2)
 ```
