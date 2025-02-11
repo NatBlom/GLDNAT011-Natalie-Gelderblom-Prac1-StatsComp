@@ -1,5 +1,5 @@
 ---
-title: "Prac1 StatsComp"
+title: "Day 1 Pracitcal StatsComp"
 author: "GLDNAT011 Natalie Gelderblom"
 ---
 
@@ -53,7 +53,6 @@ o.min<-min(ozone.cleaned)
 | Temperature | `r t.mean` | `r t.sd`           | `r t.max` | `r t.min` |
 | Ozone       | `o.mean`   | `r t.sd`           | `r t.max` | `r t.min` |
 
-
 ## Question 3
 
 3\. For linear regression, parameter estimates can be found as follows:
@@ -106,7 +105,7 @@ Use this to compare to check if the output from the lm() function gives the same
 
 ```{r}
 
-regression.to.list <- function(X,Y){
+matrixregression.to.list <- function(X,Y){
   
   # get the beta estimates 
   b_hats = solve(t(X) %*% X) %*% t(X) %*% Y
@@ -127,7 +126,7 @@ regression.to.list <- function(X,Y){
   
 }
 
-regression.to.list(X,Y)
+matrixregression.to.list(X,Y)
 
 
 lm.to.list <- function(model1){
@@ -147,7 +146,5 @@ list.1 <- regression.to.list(X,Y)
 list.1
 list.2 <- lm.to.list(model_input)
 list.2
-
-identical(list.1,list.2)
 
 ```
