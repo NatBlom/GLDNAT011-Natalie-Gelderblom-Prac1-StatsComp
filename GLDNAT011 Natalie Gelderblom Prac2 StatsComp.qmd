@@ -1,5 +1,5 @@
 ---
-title: "Day 4 PRac Statistical Computing"
+title: "Day 4 Prac Statistical Computing"
 author: "GLDNAT011 Natalie Gelderblom"
 format: html
 ---
